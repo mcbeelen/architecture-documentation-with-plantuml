@@ -1,0 +1,1 @@
+docker build -t local/antora-with-kroki-and-lunr --network=host .

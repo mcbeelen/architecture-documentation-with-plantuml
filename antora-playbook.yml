@@ -1,0 +1,35 @@
+site:
+  title: Antora site with static diagrams
+  url: /
+  start_page: docs::index.adoc
+
+content:
+  sources:
+    - url: /antora
+      branches: HEAD
+      version: true
+      start_path: docs
+
+
+ui:
+  bundle:
+    url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable
+    snapshot: true
+  supplemental_files: ./supplemental-ui
+
+
+
+asciidoc:
+  attributes:
+    safe-mode: server
+    kroki-fetch-diagram: true
+    kroki-default-format: png
+    kroki-http-method: post
+    kroki-server-url: http://kroki-server:28000
+
+  extensions:
+    - asciidoctor-kroki
+
+antora:
+  extensions:
+    - require: '@antora/lunr-extension'

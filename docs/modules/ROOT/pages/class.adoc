@@ -1,0 +1,21 @@
+= PlantUML class diagram
+Marco Beelen <marco@mcbeelen.net>
+v1.0, 2023-04-13: Start of project
+
+:icons: font
+
+== Default Class Diagram
+
+
+[plantuml]
+----
+@startuml
+Class01 <|-- Class02
+Class03 *-- Class04
+Class05 o-- Class06
+Class07 .. Class08
+Class09 -- Class10
+@enduml
+----
+
+

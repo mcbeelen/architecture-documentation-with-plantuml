@@ -1,0 +1,20 @@
+= PlantUML Sequence diagrams
+Marco Beelen <marco@mcbeelen.net>
+v1.0, 2023-04-13: Start of project
+
+:icons: font
+
+== Default Sequence Diagram
+
+[plantuml]
+----
+@startuml
+Alice -> Bob: Authentication Request
+Bob --> Alice: Authentication Response
+
+Alice -> Bob: Another authentication Request
+Alice <-- Bob: Another authentication Response
+@enduml
+----
+
+

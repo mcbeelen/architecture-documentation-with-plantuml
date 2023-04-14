@@ -1,0 +1,15 @@
+= Home page
+Marco Beelen <marco@mcbeelen.net>
+v1.0, 2023-04-13: Start of project
+
+:icons: font
+
+== Hello world!
+
+[plantuml]
+----
+@startuml
+Alice -> Bob: test
+@enduml
+----
+

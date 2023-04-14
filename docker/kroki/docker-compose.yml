@@ -1,0 +1,16 @@
+version: "3.4"
+
+services:
+
+  kroki-server:
+      image: "yuzutech/kroki"
+      ports:
+        - "28000:8000"
+      healthcheck:
+        test: wget --no-verbose --tries=1 --spider http://localhost:8000/graphviz/svg/eNpLyUwvSizIUHBXqPZIzcnJ17ULzy_KSanlAgB1EAjQ || exit 1
+        interval: 30s
+        timeout: 2s
+        retries: 1
+        start_period: 5s
+
+
