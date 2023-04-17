@@ -6,5 +6,12 @@ v1.0, 2023-04-13: Start of project
 
 == Hello world!
 
-plantuml::pumls/hello-world.puml[]
+
+[plantuml,sequence,svg,align="center"]
+----
+include::partial$plantuml/hello-world.puml[]
+----
+
+
+
 

@@ -6,16 +6,7 @@ v1.0, 2023-04-13: Start of project
 
 == Default Class Diagram
 
-
-[plantuml]
+[plantuml,class,svg,align="center"]
 ----
-@startuml
-Class01 <|-- Class02
-Class03 *-- Class04
-Class05 o-- Class06
-Class07 .. Class08
-Class09 -- Class10
-@enduml
+include::partial$plantuml/class-diagram.puml[]
 ----
-
-

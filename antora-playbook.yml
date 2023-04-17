@@ -21,7 +21,6 @@ ui:
 
 asciidoc:
   attributes:
-    safe-mode: server
     kroki-fetch-diagram: true
     kroki-default-format: png
     kroki-http-method: post
