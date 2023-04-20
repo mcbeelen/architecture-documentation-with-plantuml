@@ -6,4 +6,19 @@ v1.0, 2023-04-13: Start of project
 
 == Default Sequence Diagram
 
+
+.This work for Asciidoc + AsciidocKroki, but not in IntelliJ
+----
 plantuml::partial$plantuml/sequence.puml[]
+----
+
+Github issue for IntelllJ plugin:
+
+https://github.com/asciidoctor/asciidoctor-intellij-plugin/issues/516[516 Resolve Antora's resource identifier in the Kroki extension]
+
+== PUML-file with relative link
+
+.This does NOT work.
+----
+plantuml::{docdir}/plantuml/sequence.puml[]
+----
