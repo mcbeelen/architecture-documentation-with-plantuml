@@ -4,7 +4,9 @@ v1.0, 2023-04-13: Start of project
 
 :icons: font
 
-== Hello world!
+== PlantUML
+
+=== Hello world!
 
 
 [plantuml,sequence,svg,align="center"]
@@ -12,6 +14,9 @@ v1.0, 2023-04-13: Start of project
 include::partial$plantuml/hello-world.puml[]
 ----
 
-
-
-
+== Mermaid
+=== Distribution
+[mermaid]
+----
+include::partial$mermaid/hello-world.mermaid[]
+----
