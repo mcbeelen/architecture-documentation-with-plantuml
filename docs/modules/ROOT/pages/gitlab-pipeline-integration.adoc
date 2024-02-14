@@ -1,0 +1,165 @@
+= Gitlab pipeline integration
+
+Building an antora-generated in a pipeline requires:
+
+. A repository containing an antora-playbook
+. A `gitlab-ci.yml` in that repo to manage the build.
+. A container capable of running antora
+
+.Overview
+[plantuml]
+----
+
+actor developer
+database "git-repo\nwith documentation" as repo
+database "container\nregistry" as register
+agent "gitlab-host" as gh
+agent "build-agent" as agent
+
+developer -> repo : 1) Push an update
+repo --> gh : 2) Trigger build
+gh -> agent : 3a) Starts build on
+agent --> register : 3b) Download image\nfor running antora build
+repo <-- agent : 3c) Check out project\nwith antora-playbook.yml
+agent -> agent : 3d) Run build container
+
+agent target
+agent --> target : 3e) Push generated artifacts
+----
+
+
+[NOTE]
+====
+During the run of the container of the build-agent, antora will delegate generation of images to kroki.
+In order to do so, asciidoc should be configured with a `kroki-server-url` in the `antora-playbook.yml`
+
+  asciidoc:
+    attributes:
+      kroki-fetch-diagram: true
+      kroki-default-format: png
+      kroki-http-method: post
+      kroki-server-url: http://kroki-server:28000
+
+Off course there needs to be a running instance of kroki on the configured URL.
+This will be done by configuring services in the /.gitlab-ci.yml and the URL should match the `alias` of the kroki-container.
+
+For some types of diagrams kroki delegates to separately running services.
+When you want to support those types of images (like mermaid), then a service for that kind of image must be started as will and kroki has to be configured to find that container.
+That configuration is done via `variables` for the kroki-server in the services-section and there should be an additional service for starting given delegate.
+
+
+====
+
+.Antora build with kroki-server
+[plantuml]
+----
+
+
+
+agent "<<image-for-build-step>>\nantora-container" as antora
+agent "<<started-as-service>>\nkroki-server" as kroki
+agent "<<started-as-service>>\nmermaid-server" as mermaid
+
+antora --> kroki : Request generation of image.\lURL specified in antora-playbook.yml\lasciidoc\n  attributes\n    kroki-server-url
+kroki --> mermaid : Delegate generation of mermaid\lURL specified in gitlab-cy.yml\l services\n  alias: kroki-server\n  variables:\l     -KROKI_MERMAID_HOST: mermaid
+
+----
+
+== Gitlab-cy.yml
+
+..gitlab-ci.yml
+[source, yaml]
+----
+stages:
+  - generate-site
+
+services:
+  - name: yuzutech/kroki:0.21.3
+    alias: kroki-server
+    variables:
+      KROKI_MERMAID_HOST: mermaid
+  - name: yuzutech/kroki-mermaid:0.21.3
+    alias: mermaid
+
+pages:
+  stage: generate-site
+  image: your.container-registry.host/path/to/antora-image-with-kroki-lunr-and-kroki:tag-or-latest
+  script:
+    - apk add git
+    - git config --global credential.helper store
+    - echo "https://gitlab-ci-token:${CI_JOB_TOKEN}@your.git.host > ~/.git-credentials
+    - antora generate --log-level debug --fetch --cache-dir .cache/antora --to-dir public antora-playbook.yml
+  artifacts:
+    paths:
+      - public
+#  rules:
+# This ensures that only pushes to the default branch will trigger a pages deploy
+#    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+
+----
+
+
+[TIP]
+====
+If the antora-playbook is configured to contain content from additional git-repos is should be configured with git-credentials to allow checkout of those repose.
+The script part for the `pages`-build provide the token from the current job to antora.
+====
+
+== Antora Playbook
+
+
+
+.antora-playbook.yml
+[source,yaml]
+----
+site:
+  title: __THE_TITLE_FOR_YOUR_SITE__
+  url: __THE_URL_WHERE_THE_SITE_WILL_BE_DEPLOYED__
+  start_page: docs::index.adoc
+
+
+
+content:
+  sources:
+    - url: __PATH_WHERE_THE_PROJECT_WILL_BE_CHECKED_OUT_BY_THE_BUILD_RUNNER__
+      branches: HEAD
+      edit_url: false
+      version: true
+      start_path: docs
+    - url: https://some.remote.git.host/team/project.git
+      branches: main
+      edit_url: false
+      version: true
+      start_path: docs
+
+ui:
+  bundle:
+    url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/master/raw/build/ui-bundle.zip?job=bundle-stable
+    snapshot: true
+  supplemental_files: ./supplemental-ui
+
+asciidoc:
+  attributes:
+    sectanchors: true
+    kroki-fetch-diagram: true
+    kroki-default-format: png
+    kroki-server-url: http://kroki-server:8000
+  extensions:
+    - asciidoctor-kroki
+
+antora:
+  extensions:
+    - require: '@antora/lunr-extension'
+    - require: '@sntke/antora-mermaid-extension'
+      mermaid_library_url: https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs
+
+output:
+  dir: ./public
+
+----
+
+
+== Supplement files
+
+In order for the output HTML contain the search FROM using the LUNR-search-index,
+the antora > ui must provide a custom `header-content.hbs`.
