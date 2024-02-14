@@ -163,3 +163,26 @@ output:
 
 In order for the output HTML contain the search FROM using the LUNR-search-index,
 the antora > ui must provide a custom `header-content.hbs`.
+
+
+== The build container for gitlab
+
+As specified some build step will run a container with antora with kroki and LUNR.
+There is no default image available with that configuration, so you should build such an image yourself and upload that to your container-registry
+Building that container is best done in a seperate repo with it's own deployment of the generated image to `your.container-registry.host/path/to/antora-image-with-kroki-lunr-and-kroki`
+
+.Dockerfile
+[source]
+----
+FROM antora/antora
+
+RUN yarn global add asciidoctor-kroki
+RUN yarn global add @antora/lunr-extension
+RUN yarn global add @sntke/antora-mermaid-extension
+----
+
+=== Reference info for building the docker image
+
+* https://docs.antora.org/antora/latest/antora-container/#extend-the-antora-image[Antora]
+* https://github.com/ggrossetie/asciidoctor-kroki[Asciidoctor-kroki]
+* https://gitlab.com/antora/antora-lunr-extension[@antora/lunr-extension]
